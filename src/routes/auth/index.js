@@ -43,6 +43,7 @@ authRouter.post(
 
     const existingUser = await User.findOne({
       email: data.email,
+      password: data.password
     }).select("-password");
 
     if (!existingUser) {
