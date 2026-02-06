@@ -71,4 +71,31 @@ authRouter.post(
   },
 );
 
+authRouter.get("/me", async (req, res) => {
+  const token = req.headers.authorization; // Bearer token
+
+  if (!token) {
+    return res.status(401).json({
+      message: "Not logged in",
+    });
+  }
+
+  const [type, jwtToken] = token.split(" ");
+
+  if (!jwtToken) {
+    return res.status(401).json({
+      message: "Not logged in",
+    });
+  }
+
+  const payload = jwt.verify(jwtToken, process.env.JWT_SECRET_KEY);
+
+  const user = await User.findById(payload.userId);
+
+  return res.status(200).json({
+    message: "Your profile",
+    data: user,
+  });
+});
+
 export { authRouter };
