@@ -2,6 +2,7 @@ import { Router } from "express";
 import { User } from "./model.js";
 import { LoginValidationSchema, SignupValidationSchema } from "./validation.js";
 import { requireValidation } from "../../middlewares/require-validation.js";
+import jwt from "jsonwebtoken";
 
 const authRouter = Router();
 
@@ -42,7 +43,7 @@ authRouter.post(
 
     const existingUser = await User.findOne({
       email: data.email,
-    });
+    }).select("-password");
 
     if (!existingUser) {
       return res.status(400).json({
@@ -50,9 +51,22 @@ authRouter.post(
       });
     }
 
+    const token = jwt.sign(
+      {
+        userId: existingUser._id,
+      },
+      process.env.JWT_SECRET_KEY,
+      {
+        expiresIn: "7d",
+      },
+    );
+
     return res.status(201).json({
       message: "Welcome to login",
-      data: existingUser,
+      data: {
+        user: existingUser,
+        token,
+      },
     });
   },
 );
