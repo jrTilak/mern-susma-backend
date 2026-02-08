@@ -1,22 +1,33 @@
 import { Router } from "express";
-import { Bike } from "./model";
+import { Bike } from "./model.js";
+import { upload } from "../../lib/multer.js";
+import { requireAuth } from "../../middlewares/require-auth.js";
 
 const bikesRouter = Router();
 
 // create -> add one by only by admin
-bikesRouter.post("/", requireAuth({ isAdmin: true }), async (req, res) => {
-  const data = req.body;
+bikesRouter.post(
+  "/",
+  requireAuth({ isAdmin: true }),
+  upload.single("image"),
+  async (req, res) => {
+    const data = req.body;
 
-  const bike = await Bike.create(data);
+    const imageUrl = req.file.path;
 
-  return res.status(200).json({ Message: "Bike created successfully", bike });
-});
+    delete data.image.replace("uploads/", "");
+
+    const bike = await Bike.create({ ...data, image: imageUrl });
+
+    return res.status(200).json({ Message: "Bike created successfully", bike });
+  },
+);
 
 // read
 // get all the bikes
 
 bikesRouter.get("/", async (req, res) => {
-  const bikes = await Bike.find();
+  const bikes = await Bike.find().select("-details");
   return bikes;
 });
 
