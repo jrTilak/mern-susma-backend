@@ -25,6 +25,8 @@ authRouter.post(
       });
     }
 
+    // todo: user hashing
+
     const user = await User.create(data);
 
     return res.status(201).json({
