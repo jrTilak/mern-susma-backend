@@ -13,9 +13,9 @@ bikesRouter.post(
   async (req, res) => {
     const data = req.body;
 
-    const imageUrl = req.file.path;
+    const imageUrl = req.file.path.replace("uploads/", "");
 
-    delete data.image.replace("uploads/", "");
+    delete data.image;
 
     const bike = await Bike.create({ ...data, image: imageUrl });
 

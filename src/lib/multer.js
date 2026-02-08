@@ -2,6 +2,7 @@ import multer from "multer";
 import fs from "fs";
 
 const storage = multer.diskStorage({
+  
   destination: function (req, file, cb) {
     const userId = req.user._id;
     const folderName = `uploads/${userId}`;
@@ -21,7 +22,9 @@ const storage = multer.diskStorage({
       "." +
       file.originalname.split(".").pop(),
     );
+
   },
+
 });
 
 export const upload = multer({ storage: storage });
